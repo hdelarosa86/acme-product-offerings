@@ -29,39 +29,48 @@ const grabOfferings = () =>
 Promise.all([grabCompanies(), grabProducts(), grabOfferings()]).then(
   responses => {
     const [companies, products, offerings] = responses;
-    const fetchedProduct = fetchProduct(products);
-    //console.log(fetchedProduct);
+    const productAPI = createProductAPI(offerings, products, companies);
+    const container = document.querySelector('#container');
+    const template = products
+      .map((item, idx) => {
+        let a = '';
+        for (let i = 0; i < productAPI[idx].offerPrice.length; i++) {
+          a += `<li>Offered by:${productAPI[idx].companyName[i]} $${productAPI[idx].offerPrice[i].toFixed(2)}</li>`;
+        }
+        return `<div class="product-info">
+        <h2><a href="#${item.id}">${item.name}</a></h2>
+        <p>${item.description}</p>
+        <p>$${item.suggestedPrice}.00</p>
+        <ul>${a}</ul></div>`;
+      })
+      .join('');
 
-    const fetchedCompaniesId = fetchCompaniesId(offerings, fetchedProduct,companies);
-    console.log(fetchedCompaniesId);
-  }
-); //end response
+    render(template, container);
+  } //end responses
+); //end Promise.all
 
-const fetchProduct = products => {
-  return products.map(ele => {
-    //console.log(ele);
-    return ele.id;
-  });
-};
-
-const fetchCompaniesId = (offerings, fetchedProduct,companies) => {
-    let arr =[];
-    fetchedProduct.forEach((ele) => {
-        let obj ={productId : ele, price:[], companyId:[]};
+const createProductAPI = (offerings, products, companies) => {
+  let arr = [];
+  products.forEach(product => {
+    let obj = {
+      offerPrice: [],
+      companyName: [],
+    };
     offerings.forEach(offering => {
-      if (ele === offering.productId) {
-          let companyId;
-          companies.forEach(company => {
-              if(offering.companyId === company.id){
-                  companyId = company.name;
-              }
-          })
-        obj.price.push(offering.price);
-
-        obj.companyId.push(companyId);
+      if (product.id === offering.productId) {
+        obj.offerPrice.push(offering.price);
+        companies.forEach(company => {
+          if (offering.companyId === company.id) {
+            obj.companyName.push(company.name);
+          }
+        });
       }
     });
     arr.push(obj);
   });
   return arr;
+}; //End of createProductAPI
+
+const render = (template, node) => {
+  node.innerHTML = template;
 };
