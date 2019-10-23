@@ -1,0 +1,23 @@
+#container{
+    display: flex;
+    align-content: space-between;
+    /* justify-content: center; */
+    flex-wrap: wrap;
+    color: white;
+}
+a{
+    color: white;
+}
+.product-info{
+    width: 47%;
+    /* height: 500px; */
+    background-color: tomato;
+    border-radius: 20px;
+    margin: 1rem;
+    text-align: center;
+}
+ul{
+    width: 80%;
+    text-align: left;
+    padding: 2rem 5rem;
+}
